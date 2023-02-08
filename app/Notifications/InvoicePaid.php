@@ -29,7 +29,8 @@ class InvoicePaid extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return explode(',', $notifiable->notification_preference);
+        // return ['mail', 'database'];
     }
 
     /**
