@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\SlackMessage;
 
 class InvoicePaid extends Notification
 {
@@ -29,7 +30,7 @@ class InvoicePaid extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['mail', 'database', 'slack'];
     }
 
     /**
@@ -52,6 +53,22 @@ class InvoicePaid extends Notification
             'amount' => 100,
             'invoice_action' => 'pay it',
         ];
+    }
+
+    public function toSlack($notifiable)
+    {
+        return (new SlackMessage())
+                ->success()
+                ->content('One of your invoices has been paid!')
+                ->attachment(function ($attachment) {
+                    $attachment->title('Invoice 1322')
+                               ->fields([
+                                    'Title' => 'Server Expenses',
+                                    'Amount' => '$1,234',
+                                    'Via' => 'American Express',
+                                    'Was Overdue' => ':-1:',
+                                ]);
+                });
     }
 
     /**
